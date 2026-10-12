@@ -9,7 +9,7 @@ public class HelloController {
 
     @GetMapping("/")
     public String home() {
-        return "Mini app is running";
+        return "Mini app is running it is changed by me ";
     }
 
     @GetMapping("/hello")
