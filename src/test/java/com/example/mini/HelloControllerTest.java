@@ -10,7 +10,7 @@ class HelloControllerTest {
 
     @Test
     void helloDefault() {
-        assertEquals("Hello, World!", controller.hello("World"));
+        assertEquals("Hello, Wrong!", controller.hello("World"));
     }
 
     @Test
