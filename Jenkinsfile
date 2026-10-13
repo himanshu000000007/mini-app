@@ -3,9 +3,7 @@ pipeline {
 
     environment {
         IMAGE          = 'mini-app'
-        CONTAINER      = 'mini'
-        HOST_PORT      = '8081'
-        DOCKERHUB_USER = 'himanshu5452006'   // <-- apna username
+        DOCKERHUB_USER = 'himanshu5452006'
     }
 
     stages {
@@ -35,8 +33,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    docker rm -f ${CONTAINER} || true
-                    docker run -d --name ${CONTAINER} -p ${HOST_PORT}:8080 ${IMAGE}:${BUILD_NUMBER}
+                    docker rm -f mini || true
+                    APP_TAG=${BUILD_NUMBER} docker compose up -d --build --remove-orphans
                 '''
             }
         }
@@ -45,9 +43,9 @@ pipeline {
             steps {
                 sh '''
                     for i in $(seq 1 20); do
-                        if curl -sf http://localhost:${HOST_PORT}/; then
+                        if curl -sf http://localhost:8081/; then
                             echo
-                            curl -sf "http://localhost:${HOST_PORT}/hello?name=Jenkins"
+                            curl -sf "http://localhost:8081/hello?name=Jenkins"
                             echo
                             exit 0
                         fi
@@ -83,7 +81,7 @@ pipeline {
             echo 'Build PASSED. App: http://localhost:8081'
         }
         failure {
-            sh 'docker logs ${CONTAINER} || true'
+            sh 'docker compose logs --tail=50 || true'
             echo 'Build FAILED'
         }
     }
