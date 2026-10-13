@@ -1,0 +1,16 @@
+name: mini
+
+services:
+  app:
+    build: .
+    image: mini-app:${APP_TAG:-latest}
+    restart: unless-stopped
+
+  nginx:
+    build: ./nginx
+    image: mini-nginx:latest
+    ports:
+      - "8081:80"
+    depends_on:
+      - app
+    restart: unless-stopped
