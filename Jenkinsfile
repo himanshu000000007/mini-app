@@ -5,7 +5,7 @@ pipeline {
         IMAGE          = 'mini-app'
         CONTAINER      = 'mini'
         HOST_PORT      = '8081'
-        DOCKERHUB_USER = 'your-dockerhub-username'   // <-- apna username
+        DOCKERHUB_USER = 'himanshu5452006'   // <-- apna username
     }
 
     stages {
