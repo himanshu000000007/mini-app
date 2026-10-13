@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     environment {
-        IMAGE     = 'mini-app'
-        CONTAINER = 'mini'
-        HOST_PORT = '8081'      // 8080 par Jenkins hai
+        IMAGE          = 'mini-app'
+        CONTAINER      = 'mini'
+        HOST_PORT      = '8081'
+        DOCKERHUB_USER = 'your-dockerhub-username'   // <-- apna username
     }
 
     stages {
@@ -57,12 +58,29 @@ pipeline {
                 '''
             }
         }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
+                                                  usernameVariable: 'DH_USER',
+                                                  passwordVariable: 'DH_PASS')]) {
+                    sh '''
+                        echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                        docker tag ${IMAGE}:${BUILD_NUMBER} ${DOCKERHUB_USER}/${IMAGE}:${BUILD_NUMBER}
+                        docker tag ${IMAGE}:${BUILD_NUMBER} ${DOCKERHUB_USER}/${IMAGE}:latest
+                        docker push ${DOCKERHUB_USER}/${IMAGE}:${BUILD_NUMBER}
+                        docker push ${DOCKERHUB_USER}/${IMAGE}:latest
+                        docker logout
+                    '''
+                }
+            }
+        }
     }
 
     post {
         success {
             archiveArtifacts artifacts: 'target/app.jar', fingerprint: true
-            echo "Build PASSED. App: http://localhost:8081"
+            echo 'Build PASSED. App: http://localhost:8081'
         }
         failure {
             sh 'docker logs ${CONTAINER} || true'
