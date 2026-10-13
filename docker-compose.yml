@@ -14,3 +14,26 @@ services:
     depends_on:
       - app
     restart: unless-stopped
+
+  prometheus:
+    build: ./monitoring/prometheus
+    image: mini-prometheus:latest
+    ports:
+      - "9090:9090"
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  grafana:
+    build: ./monitoring/grafana
+    image: mini-grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  grafana-data:
