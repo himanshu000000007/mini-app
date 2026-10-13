@@ -74,7 +74,18 @@ pipeline {
             }
         }
     }
-
+         stage('SonarQube Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \
+                            -Dsonar.projectKey=mini-app \
+                            -Dsonar.host.url=http://localhost:9000 \
+                            -Dsonar.token=${SONAR_TOKEN}
+                    '''
+                }
+            }
+        }
     post {
         success {
             archiveArtifacts artifacts: 'target/app.jar', fingerprint: true
